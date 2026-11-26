@@ -79,6 +79,7 @@ test('integración HTTP con MongoDB y SMTP', { timeout: 180_000 }, async (t) => 
     SMTP_USER: '',
     SMTP_PASSWORD: '',
     MAIL_FROM: 'pruebas@example.test',
+    APPOINTMENTS_NOTIFY_EMAIL: 'agenda@example.test',
   })
 
   const { default: app } = await import('../src/index.js')
@@ -216,11 +217,15 @@ test('integración HTTP con MongoDB y SMTP', { timeout: 180_000 }, async (t) => 
       const [first, overlap, later] = available.data
       const book = (startAt, token) =>
         call('/appointments', 'POST', { serviceId: service, startAt }, token)
+      const mailCount = mails.length
       const [primary, concurrent] = await Promise.all([
         book(first, client),
         book(overlap, other),
       ])
       assert.deepEqual([primary.status, concurrent.status].sort(), [201, 409])
+      assert.equal(mails.length, mailCount + 1)
+      assert.match(mails.at(-1), /^To: agenda@example\.test\r?$/m)
+      assert.match(mails.at(-1), /Nuevo turno/)
       let current = primary.status === 201 ? primary.data : concurrent.data
       const owner = primary.status === 201 ? client : other
       const outsider = primary.status === 201 ? other : client
@@ -246,6 +251,8 @@ test('integración HTTP con MongoDB y SMTP', { timeout: 180_000 }, async (t) => 
         owner,
       )
       assert.equal(moved.status, 200)
+      assert.equal(mails.length, mailCount + 2)
+      assert.match(mails.at(-1), /Turno reprogramado/)
       current = (await call(path, 'GET', undefined, owner)).data
       assert.equal(current.startAt, later)
       assert.equal(
@@ -258,6 +265,8 @@ test('integración HTTP con MongoDB y SMTP', { timeout: 180_000 }, async (t) => 
         'Sesión personalizada',
       )
       assert.equal((await call(path, 'DELETE', undefined, owner)).status, 204)
+      assert.equal(mails.length, mailCount + 3)
+      assert.match(mails.at(-1), /Turno cancelado/)
       assert.equal((await call('/appointments', 'GET', undefined, owner)).data.total, 0)
     },
   )

@@ -1,5 +1,19 @@
 import nodemailer from 'nodemailer'
 import { env } from './env.js'
+import { ZONE } from '../utils/schedule.js'
+
+const appointmentDate = new Intl.DateTimeFormat('es-AR', {
+  dateStyle: 'full',
+  timeStyle: 'short',
+  hourCycle: 'h23',
+  timeZone: ZONE,
+})
+
+const appointmentSubjects = {
+  created: 'Nuevo turno',
+  updated: 'Turno reprogramado',
+  removed: 'Turno cancelado',
+}
 
 const transport = nodemailer.createTransport({
   host: env.SMTP_HOST,
@@ -25,4 +39,38 @@ export function sendVerificationEmail(email, token) {
       url.href +
       '\n\nEl enlace vence en dos horas. Si no creaste una cuenta, podés ignorar este mensaje.',
   })
+}
+
+export async function notifyAppointment(event, appointment) {
+  if (!env.APPOINTMENTS_NOTIFY_EMAIL) return
+
+  const subject = appointmentSubjects[event]
+  const client = appointment.client
+  const details = [
+    subject + ' en Aroma Spa.',
+    'Servicio: ' + appointment.serviceName,
+    'Fecha y hora: ' +
+      appointmentDate.format(appointment.startAt) +
+      ' (hora argentina)',
+    'Duración: ' + appointment.duration + ' min',
+  ]
+  if (client?.email) details.push('Cliente: ' + client.name + ' <' + client.email + '>')
+
+  const agenda = new URL('/mis-turnos', env.CLIENT_ORIGIN)
+  details.push('', 'Abrí la agenda para consultar tus turnos: ' + agenda.href)
+
+  try {
+    await transport.sendMail({
+      from: env.MAIL_FROM,
+      to: env.APPOINTMENTS_NOTIFY_EMAIL,
+      subject: subject + ' de Aroma Spa',
+      text: details.join('\n'),
+    })
+  } catch (error) {
+    console.error('No se pudo enviar el aviso de turno.', {
+      event,
+      appointmentId: String(appointment._id),
+      code: error.code,
+    })
+  }
 }

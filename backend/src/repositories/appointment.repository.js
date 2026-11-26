@@ -12,7 +12,10 @@ export const appointmentRepository = {
     ),
   count: (scope, filter) => Appointment.countDocuments({ ...scope, ...filter }),
   find: (id, scope) => details(Appointment.findOne({ _id: id, ...scope })),
-  create: (fields) => Appointment.create(fields),
+  async create(fields) {
+    const appointment = await Appointment.create(fields)
+    return appointment.populate('client', 'name email')
+  },
   update: (id, scope, fields) =>
     details(
       Appointment.findOneAndUpdate({ _id: id, ...scope }, fields, {
@@ -20,7 +23,7 @@ export const appointmentRepository = {
         runValidators: true,
       }),
     ),
-  remove: (id, scope) => Appointment.findOneAndDelete({ _id: id, ...scope }),
+  remove: (id, scope) => details(Appointment.findOneAndDelete({ _id: id, ...scope })),
   busy: (start, end) =>
     Appointment.find({
       startAt: { $lt: end },

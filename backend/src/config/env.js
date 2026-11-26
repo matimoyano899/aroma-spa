@@ -18,6 +18,11 @@ const schema = z
     SMTP_USER: z.string().optional(),
     SMTP_PASSWORD: z.string().optional(),
     MAIL_FROM: z.string().min(1),
+    APPOINTMENTS_NOTIFY_EMAIL: z
+      .string()
+      .trim()
+      .pipe(z.union([z.email(), z.literal('')]))
+      .optional(),
   })
   .refine((value) => Boolean(value.SMTP_USER) === Boolean(value.SMTP_PASSWORD), {
     message: 'Completar SMTP_USER y SMTP_PASSWORD en conjunto.',

@@ -1,3 +1,4 @@
+import { notifyAppointment } from '../config/mailer.js'
 import { appointmentRepository as bookings } from '../repositories/appointment.repository.js'
 import { catalogService } from './catalog.service.js'
 import { ApiError } from '../utils/api-error.js'
@@ -80,7 +81,8 @@ export const appointmentsService = {
   async create(user, input) {
     try {
       const item = await bookings.create({ client: user.id, ...(await fields(input)) })
-      return this.detail(String(item._id), user)
+      await notifyAppointment('created', item)
+      return response(item, user)
     } catch (error) {
       if (error.code === 11000) throw unavailable()
       throw error
@@ -109,6 +111,7 @@ export const appointmentsService = {
           'El turno cambió. Actualizá la página.',
           'APPOINTMENT_CHANGED',
         )
+      await notifyAppointment('updated', item)
       return response(item, user)
     } catch (error) {
       if (error.code === 11000) throw unavailable()
@@ -119,7 +122,11 @@ export const appointmentsService = {
     const userScope = scope(user)
     const filter =
       user.role === 'admin' ? userScope : { ...userScope, startAt: { $gt: new Date() } }
-    if (await bookings.remove(id, filter)) return
+    const item = await bookings.remove(id, filter)
+    if (item) {
+      await notifyAppointment('removed', item)
+      return
+    }
     if (!(await bookings.find(id, userScope))) throw notFound()
     throw new ApiError(
       409,
