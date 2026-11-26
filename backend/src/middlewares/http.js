@@ -49,7 +49,7 @@ export function handleError(error, _req, res, next) {
     })
   }
   const unavailable = error instanceof mongoose.Error.MongooseServerSelectionError
-  console.error('[aroma] Error de API:', error.name)
+  console.error('[aroma] Error de API:', error.name, error.code, error.codeName)
   return res.status(unavailable ? 503 : 500).json({
     error: unavailable
       ? { message: 'La agenda está temporalmente indisponible.', code: 'UNAVAILABLE' }
