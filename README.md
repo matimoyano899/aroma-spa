@@ -4,6 +4,8 @@ Trabajo integrador de Desarrollo Full Stack, UTN FRBA e-Learning. Aplicación de
 
 El recorrido de una clienta es registro, confirmación por correo, login, elección de servicio y horario, reserva, detalle, reprogramación y cancelación. El panel de administración permite consultar la agenda y crear, ver, editar o archivar servicios.
 
+Con `APPOINTMENTS_NOTIFY_EMAIL` configurado, la profesional recibe un correo por cada reserva, cambio o cancelación. El aviso incluye el servicio, la fecha y hora argentina, la duración y el contacto de la persona. Si el envío falla, la operación queda guardada en la agenda y el servidor registra el fallo.
+
 ## Arranque local
 
 Requiere Node.js 22.12 o posterior, npm y acceso a MongoDB y SMTP. El archivo Docker Compose levanta MongoDB y Mailpit para desarrollo. Si ya disponés de ambos servicios, podés usar sus datos de conexión.
@@ -74,4 +76,6 @@ Probar los estados `400` de input inválido, `401` de sesión faltante, `403` de
 
 ## Entrega
 
-La publicación requiere que el repositorio esté en GitHub, un usuario de MongoDB Atlas y SMTP para enviar correos. En [Publicación y guía de demo](docs/PUBLICACION.md) están las dos configuraciones de Vercel, las variables y el recorrido para presentar el integrador.
+Repositorio: [Aroma Spa en GitHub](https://github.com/matimoyano899/aroma-spa).
+
+La publicación requiere un usuario de MongoDB Atlas y un proveedor SMTP. Consultá [Publicación y guía de demo](docs/PUBLICACION.md) para configurar los dos despliegues y comprobarlos antes de entregar.

@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
+    "check:mail": "node scripts/check-mail.js",
     "test": "node --test --test-concurrency=1",
     "seed": "node scripts/seed.js"
   },

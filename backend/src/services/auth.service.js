@@ -30,7 +30,12 @@ export const publicUser = (user) => ({
 async function mailVerification(email, token) {
   try {
     await sendVerificationEmail(email, token)
-  } catch {
+  } catch (error) {
+    console.warn('[aroma] Verificación SMTP fallida:', {
+      code: error.code,
+      responseCode: error.responseCode,
+      command: error.command,
+    })
     throw new ApiError(
       503,
       'El correo está temporalmente indisponible. Podés pedir un enlace nuevo.',
@@ -63,9 +68,9 @@ export const authService = {
     const user = await userRepository.rotateVerification(email, fields)
     if (user) {
       try {
-        await sendVerificationEmail(email, token)
-      } catch {
-        console.warn('[aroma] No se pudo reenviar el correo de verificación.')
+        await mailVerification(email, token)
+      } catch (error) {
+        if (error.code !== 'MAIL_UNAVAILABLE') throw error
       }
     }
   },

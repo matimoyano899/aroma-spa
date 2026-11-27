@@ -15,7 +15,7 @@ const appointmentSubjects = {
   removed: 'Turno cancelado',
 }
 
-const transport = nodemailer.createTransport({
+export const mailTransport = nodemailer.createTransport({
   host: env.SMTP_HOST,
   port: env.SMTP_PORT,
   secure: env.SMTP_SECURE,
@@ -30,7 +30,7 @@ export function sendVerificationEmail(email, token) {
   const url = new URL('/verificar-email', env.CLIENT_ORIGIN)
   url.hash = new URLSearchParams({ token }).toString()
 
-  return transport.sendMail({
+  return mailTransport.sendMail({
     from: env.MAIL_FROM,
     to: email,
     subject: 'Confirmá tu cuenta de Aroma Spa',
@@ -60,7 +60,7 @@ export async function notifyAppointment(event, appointment) {
   details.push('', 'Abrí la agenda para consultar tus turnos: ' + agenda.href)
 
   try {
-    await transport.sendMail({
+    await mailTransport.sendMail({
       from: env.MAIL_FROM,
       to: env.APPOINTMENTS_NOTIFY_EMAIL,
       subject: subject + ' de Aroma Spa',
@@ -71,6 +71,8 @@ export async function notifyAppointment(event, appointment) {
       event,
       appointmentId: String(appointment._id),
       code: error.code,
+      responseCode: error.responseCode,
+      command: error.command,
     })
   }
 }

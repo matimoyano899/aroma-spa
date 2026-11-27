@@ -11,6 +11,15 @@
 7. Una vez, ejecutá `npm run seed` desde tu terminal con la URI de producción y los dos valores `ADMIN_*` en tu entorno local. Nunca cargues el secreto de siembra administrador en las variables de Vercel. Volvé a quitar esos valores de la configuración local cuando termines.
 8. Confirmá `/api/health` y `/api/ready` en el dominio público. Hacé el circuito de demo en la URL pública del frontend, con una cuenta nueva.
 
+Para activar los avisos de agenda, agregá `APPOINTMENTS_NOTIFY_EMAIL` en el proyecto del backend y volvé a desplegar si ya estaba publicado. Usá el correo donde la profesional quiere recibir las reservas, reprogramaciones y cancelaciones. `MAIL_FROM` sigue siendo el remitente autorizado por el proveedor SMTP. La verificación de cuenta se envía al correo de cada persona que se registra.
+
+## Comprobar la publicación
+
+- Abrí `/api/ready` desde la URL pública. Debe responder `{"data":{"database":"ready"}}`. Confirmá que Atlas autorice la salida del backend durante todo el período de corrección.
+- Con las variables SMTP en `backend/.env`, ejecutá `npm run check:mail -w backend`. Comprueba conexión y autenticación sin enviar un correo. Para comprobar además que el proveedor acepta el remitente, ejecutá `npm run check:mail -w backend -- tu-buzon-de-prueba@example.com` con un buzón propio. Revisá la recepción y, si falla, mirá el código SMTP en la terminal.
+- Desde la web pública, registrá una cuenta nueva y abrí el enlace recibido. Los registros del backend muestran el código y comando SMTP si el intento falla. Confirmá también que lleguen los avisos de agenda al destinatario configurado.
+- En Postman, usá la URL pública de la API seguida de `/api` como `baseUrl`. Completá las variables de prueba en tu entorno local de Postman. El archivado del servicio está en la carpeta **Limpieza**, después de las pruebas de turnos.
+
 El límite de intentos de la API que trae el proyecto es por instancia. Si instalás múltiples instancias para uso continuo y necesitás un límite global, conectá un almacén compartido o aplicá el límite del proveedor. Las colisiones de turnos sí se resuelven de forma compartida en MongoDB.
 
 Referencia de despliegue de la API: [Express en Vercel](https://vercel.com/docs/frameworks/backend/express).

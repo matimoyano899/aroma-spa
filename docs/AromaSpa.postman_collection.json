@@ -2,7 +2,7 @@
   "info": {
     "name": "Aroma Spa · Agenda de turnos",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Completá las variables de correo y contraseña de prueba. Copiá el token del buzón de verificación. Elegí una fecha futura habilitada en formato AAAA-MM-DD. Ejecutá autenticación, creación de servicio, pruebas de turnos y archivado del servicio en ese orden. Para compartir la colección, borrá valores de contraseñas y tokens."
+    "description": "Elegí el entorno con baseUrl. Completá las credenciales de prueba y una fecha futura habilitada en formato AAAA-MM-DD. Ejecutá las solicitudes en orden. Después del registro, copiá el token del enlace del buzón en verificationToken antes de confirmar. Archivá el servicio desde Limpieza cuando terminen las pruebas. Borrá contraseñas y tokens antes de compartir la colección."
   },
   "variable": [
     {
@@ -474,30 +474,6 @@
             }
           ],
           "response": []
-        },
-        {
-          "name": "Archivar después de probar los turnos",
-          "request": {
-            "method": "DELETE",
-            "url": "{{baseUrl}}/services/{{serviceId}}",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{adminToken}}",
-                "type": "text"
-              }
-            ]
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": ["pm.test('HTTP 204', () => pm.response.to.have.status(204));"]
-              }
-            }
-          ],
-          "response": []
         }
       ]
     },
@@ -756,6 +732,35 @@
               "script": {
                 "type": "text/javascript",
                 "exec": ["pm.test('HTTP 404', () => pm.response.to.have.status(404));"]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Limpieza",
+      "item": [
+        {
+          "name": "Archivar después de probar los turnos",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/services/{{serviceId}}",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "type": "text"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('HTTP 204', () => pm.response.to.have.status(204));"]
               }
             }
           ],
