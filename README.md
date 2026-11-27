@@ -72,10 +72,12 @@ Probar los estados `400` de input inválido, `401` de sesión faltante, `403` de
 
 - `npm test` ejecuta los casos de horarios y la integración HTTP con MongoDB de prueba y un buzón SMTP temporal. Si usás una instancia de pruebas ya iniciada, indicá `TEST_MONGODB_URI`; el test crea y elimina una base con prefijo `aroma_test_`.
 - `npm run build` compila React para producción.
-- Importá [AromaSpa.postman_collection.json](docs/AromaSpa.postman_collection.json). Usá correos de prueba. Copiá el token de verificación del buzón local en la variable `verificationToken`. La colección guarda el JWT y los ID de las respuestas para el resto del flujo.
+- Importá [la colección de Postman](docs/AromaSpa.postman_collection.json). El valor inicial de `baseUrl` apunta al entorno local. Para consultar la API pública, importá y seleccioná [el entorno de producción](docs/AromaSpa.Produccion.postman_environment.json). Para ejecutar el flujo de autenticación, usá un correo de prueba y copiá el token del enlace recibido en `verificationToken`. La colección guarda el JWT y los ID de las respuestas para el resto del flujo.
 
 ## Entrega
 
-Repositorio: [Aroma Spa en GitHub](https://github.com/matimoyano899/aroma-spa).
+- Repositorio de React y Express en [Aroma Spa en GitHub](https://github.com/matimoyano899/aroma-spa).
+- Frontend de producción en [Vercel](https://aroma-spa-kappa.vercel.app/).
+- Backend de producción en [Render](https://aroma-spa.onrender.com/api/ready). El catálogo público se puede consultar en [`GET /api/services`](https://aroma-spa.onrender.com/api/services).
 
-La publicación requiere un usuario de MongoDB Atlas y un proveedor SMTP. Consultá [Publicación y guía de demo](docs/PUBLICACION.md) para configurar los dos despliegues y comprobarlos antes de entregar.
+Consultá el [README del frontend](frontend/README.md), el [README del backend](backend/README.md) y la [guía de publicación y demo](docs/PUBLICACION.md).
